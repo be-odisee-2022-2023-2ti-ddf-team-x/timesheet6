@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th = "http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>Timesheet</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+    <script>
+        function rowClicked(value) {
+            location.href = "/timesheet/edit" + value
+        }
+    </script>
+</head>
+<body>
+<h1>Welcome to Timesheet <span th:text="${fullname}"> username </span></h1>
+
+<img th:src="@{/images/punch-in-cc-by-Tom-Blackwell.jpg}" style="float: right" />
+
+<form method="POST" th:action="@{/logout}" style="float: right">
+    <button class="btn btn-danger btn-md logout" name="logout" value="Logout">Logout</button>
+</form>
+
+<form method="POST" th:action="@{/timesheet}" th:object="${entryData}">
+
+    <input type="hidden" th:field="*{id}" />
+
+    <div class="well">
+        <!-- OVHD, NETW, PROSP, FULF, REND, TRAVEL -->
+        <span th:each = "category : ${categoriesWithProjects}" class="category" >
+            <label th:text="${category.getKey()}">thelabel</label> <br/>
+            <select th:field = "*{projectIds}">
+                <option value="0"> No choice </option>
+                <option th:each = "project : ${category.getValue()}"
+                        th:value = "${project.id}"
+                        th:text = "${project.name}">
+                </option>
+            </select>&nbsp;
+        </span>
+        <span class="category"><label>Strategic objective</label><br/>
+            <select th:field = "*{objectiveId}">
+                <option value="0"> No choice </option>
+                <option th:each = "objective: ${objectives}"
+                        th:value = "${objective.id}"
+                        th:text = "${objective.name}">
+                </option>
+            </select>
+        </span>
+    </div>
+    <div class="form-group">
+        <label>Date:&nbsp;</label><input type="date" th:field="*{entryDatum}"/> &nbsp;
+        <span class="validationError"
+              th:if="#{fields.hasErrors('entryDatum')}"
+              th:errors="*{entryDatum}">entryDatumError
+        </span>
+        <label>From:&nbsp;</label><input type="time" th:field="*{startTime}" /> &nbsp;
+        <span class="validationError"
+              th:if="#{fields.hasErrors('startTime')}"
+              th:errors="*{startTime}">startTimeError
+        </span>
+        <label>To:&nbsp;</label><input type="time" th:field="*{endTime}" />
+        <span class="validationError"
+              th:if="#{fields.hasErrors('endTime')}"
+              th:errors="*{endTime}">endTimeError
+        </span>
+    </div>
+    <div class="form-group">
+        <label>Description:&nbsp;</label><input type="text" th:field="*{description}" style="width: 40em" />
+        <span class="validationError"
+              th:if="#{fields.hasErrors('description')}"
+              th:errors="*{description}">descriptionError
+        </span>
+    </div>
+    <div th:if="${entryData.getId()}==0" class="form-group">
+        <div style="float: left" >
+            <button class="btn btn-primary btn-md" name="submit" style="float: right; margin-right: 1em">Create entry</button>
+            <button class="btn btn-success btn-md" name="endnow" style="float: right; margin-right: 1em">End=Now</button>
+            <button class="btn btn-success btn-md" name="startnow" style="float: right; margin-right: 1em">Start=Now</button>
+            <div style="clear: both"></div>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+    <div th:if="${entryData.getId()}!=0" class="form-group">
+        <button class="btn btn-primary btn-md" name="submit">Update entry</button>
+        <button class="btn btn-danger btn-md" name="delete">Delete entry</button>
+        <button class="btn btn-warning btn-md" name="cancel">Cancel</button>
+    </div>
+</form>
+
+<div class="well" th:if="${message}!=null" th:text="${message}">
+    blablabla
+</div>
+
+<div th:if="${entries.size()}!=0" class="table-striped well" >
+    <div th:each="entry: ${entries}" class="row"
+         th:onclick="'window.location.href = \'' + @{/timesheet/edit?id={id} (id=${entry.getId()}) } + '\''"  >
+        <div class="col-md-1 text-left"
+             th:text="${#temporals.format(entry.getDateTimeFrom(), 'HH:mm')}"> from
+        </div>
+        <div class="col-md-1 text-left"
+             th:text="${#temporals.format(entry.getDateTimeTo(), 'HH:mm')}"> to
+        </div>
+        <div class="col-md-1 text-left"
+             th:text="${#numbers.formatInteger(entry.getDuration().toHours(),2)+':'+
+                        #numbers.formatInteger(entry.getDuration().toMinutes()-entry.getDuration().toHours()*60,2)}"> duration
+        </div>
+        <div class="col-md-1 text-left" th:text="${entry.getProject().getCategory().getName()}"> category </div>
+        <div class="col-md-1 text-left" th:text="${entry.getProject().getName()}"> project </div>
+        <div class="col-md-5 text-left" th:text="${entry.getDescription()}"> description </div>
+        <div class="col-md-2 text-left" th:if="${entry.getObjective()!=null}"
+             th:text="${entry.getObjective().getName()}"> objective </div>
+    </div>
+    <div>&nbsp;</div>
+    <div class="row" >
+        <div class="col-md-2 text-left">Total duration: </div>
+        <div class="col-md-1 text-left"
+             th:text="${#numbers.formatInteger(totalDuration.toHours(),2)+':'+
+                        #numbers.formatInteger(totalDuration.toMinutes()-totalDuration.toHours()*60,2)}"> total duration
+        </div>
+        <div class="col-md-5 text-left"></div>
+    </div>
+</div>
+
+</body>
+</html>

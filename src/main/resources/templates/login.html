@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th = "http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>Timesheet</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body>
+<h1>Welcome to Timesheet</h1>
+<img th:src="@{/images/punch-in-cc-by-Tom-Blackwell.jpg}" style="float: right"/>
+
+<div th:if="${error}" style="color: red; margin-top: 1em; margin-bottom: 1em;">
+Unable to login. Check your username and password.<br/>
+</div>
+<form method="POST" th:action="@{/login}">
+    <label for="username">Username: </label>
+    <input type="text" name="username"/><br/>
+    <label for="password">Password: </label>
+    <input type="password" name="password"/><br/>
+    <input type="submit" value="Login"/>
+</form>
+</body>
+</html>
