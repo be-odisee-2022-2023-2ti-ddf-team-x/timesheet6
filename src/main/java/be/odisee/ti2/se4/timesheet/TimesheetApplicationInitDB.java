@@ -57,6 +57,7 @@ public class TimesheetApplicationInitDB implements CommandLineRunner {
         );
 
         for (User user: users) {
+
             // user must be saved for it to have an id
             userRepository.save(user);
             // There must be 1 dummy entry for each user to save the next startTimeFrom

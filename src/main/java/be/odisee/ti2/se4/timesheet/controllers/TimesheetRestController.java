@@ -12,6 +12,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,12 @@ public class TimesheetRestController {
     @GetMapping("/objectives")
     public Object getObjectives(){
         return timesheetService.getObjectives();
+    }
+
+    @GetMapping("/entriesFromDate")
+    public List<Entry> getEntriesFromDate(String entryDatum) {
+        LocalDate theDatum = LocalDate.parse(entryDatum);
+        return timesheetService.getEntriesFromDate(theDatum);
     }
 
     /**

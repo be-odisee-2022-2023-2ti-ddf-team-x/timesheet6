@@ -193,8 +193,8 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public List<Entry> getEntriesFromDate(LocalDate theDate) {
 
-        LocalDateTime startDateTime = LocalDateTime.of(theDate, LocalTime.parse("00:00"));
-        LocalDateTime endDateTime = LocalDateTime.of(theDate, LocalTime.parse("23:59"));
+        LocalDateTime startDateTime = LocalDateTime.of(theDate, LocalTime.parse("00:00:00.0"));
+        LocalDateTime endDateTime = LocalDateTime.of(theDate, LocalTime.parse("23:59:00.0"));
         return entryRepository.findByProjectNotNullAndUserAndDateTimeFromBetween(findAuthenticatedUser(), startDateTime, endDateTime);
     }
 

@@ -31,7 +31,13 @@ public class Entry {
     @ManyToOne
     private Objective objective;
 
-    private LocalDateTime dateTimeFrom, dateTimeTo;
+    @Basic
+    private LocalDateTime dateTimeFrom;
+
+    @Basic
+    private LocalDateTime dateTimeTo;
+
+    @Basic
     private Duration duration;
 
     private String description;

@@ -3,6 +3,7 @@ package be.odisee.ti2.se4.timesheet.dao;
 import be.odisee.ti2.se4.timesheet.domain.Entry;
 import be.odisee.ti2.se4.timesheet.domain.Project;
 import be.odisee.ti2.se4.timesheet.domain.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDate;
