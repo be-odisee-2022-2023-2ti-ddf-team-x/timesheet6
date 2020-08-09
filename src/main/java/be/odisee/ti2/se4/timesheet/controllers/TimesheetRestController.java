@@ -43,6 +43,11 @@ public class TimesheetRestController {
         return timesheetService.getObjectives();
     }
 
+    @GetMapping("/entrydata")
+    public Object getEntryData(){
+        return timesheetService.prepareNewEntryData();
+    }
+
     @GetMapping("/entriesFromDate")
     public List<Entry> getEntriesFromDate(String entryDatum) {
         LocalDate theDatum = LocalDate.parse(entryDatum);
@@ -57,8 +62,6 @@ public class TimesheetRestController {
     public String processEntry(@Valid @RequestBody EntryData entryData, Errors errors) {
 
         String message="";
-
-        System.out.println("DEBUG EntryData: "+entryData.toString());
 
         try {
             // Are there any input validation errors detected by JSR 380 bean validation?
