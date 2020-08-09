@@ -43,7 +43,7 @@ public class TimesheetRestController {
         return timesheetService.getObjectives();
     }
 
-    @GetMapping("/entrydata")
+    @GetMapping("/newentrydata")
     public Object getEntryData(){
         return timesheetService.prepareNewEntryData();
     }
@@ -88,5 +88,14 @@ public class TimesheetRestController {
         }
         return message;
     }
+
+    @GetMapping("/editentrydata")
+    public Object entryEditForm(@RequestParam("id") long id) {
+
+        System.out.println("id is "+id);
+        EntryData entryData = timesheetService.prepareEntryDataToEdit(id);
+        return entryData;
+    }
+
 
 }
