@@ -131,8 +131,10 @@ public class TimesheetServiceImpl implements TimesheetService {
             entryData.setEntryDatum( theEntry.getDateTimeTo().toLocalDate().toString() );
             if (timeShift) {
                 // The right to be used dateTimeFrom is in the dummy entry for this user
-                entryData.setStartTime( findAuthenticatedUser().getDummyEntry().getDateTimeFrom()
-                                            .toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) );
+                // Ik denk dat we dit historisch niet zo goed deden hier
+                // entryData.setStartTime( findAuthenticatedUser().getDummyEntry().getDateTimeFrom()
+                //                            .toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) );
+                entryData.setStartTime( theEntry.getDateTimeTo().toLocalTime().toString() );
                 entryData.setEndTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
             } else {
                 entryData.setStartTime( theEntry.getDateTimeFrom().toLocalTime().toString() );

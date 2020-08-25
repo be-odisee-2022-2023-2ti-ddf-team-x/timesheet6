@@ -80,8 +80,8 @@ public class TimesheetRestController {
             // Now that the input seems to be OK, let's create a new entry or update/delete an existing entry
             message = timesheetService.processEntry(entryData);
 
-            // Prepare form for new data-entry
-            entryData = timesheetService.prepareNewEntryData();
+            // Prepare form for new data-entry - moeten we niet meer doen in dit geval
+            // entryData = timesheetService.prepareNewEntryData();
 
         } catch (IllegalArgumentException e) {
             // Nothing special needs to be done
@@ -89,12 +89,27 @@ public class TimesheetRestController {
         return message;
     }
 
+    /**
+     * Prepare entryData to be edited
+     * @param id of entry to be edited
+     * @return the original data to be edited by the caller
+     */
     @GetMapping("/editentrydata")
     public Object entryEditForm(@RequestParam("id") long id) {
 
-        System.out.println("id is "+id);
         EntryData entryData = timesheetService.prepareEntryDataToEdit(id);
         return entryData;
+    }
+
+    /**
+     * Delete the entry and prepare for creation of a new one
+     * @return
+     */
+    @PostMapping(path = "deleteEntry", consumes = "application/json")
+    public String deleteEntry(@RequestBody EntryData entryData) {
+
+        timesheetService.deleteEntry(entryData.getId());
+        return "Successfully deleted entry "+entryData.getDescription();
     }
 
 
