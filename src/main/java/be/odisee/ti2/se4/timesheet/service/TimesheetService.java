@@ -2,6 +2,7 @@ package be.odisee.ti2.se4.timesheet.service;
 
 import be.odisee.ti2.se4.timesheet.domain.Entry;
 import be.odisee.ti2.se4.timesheet.domain.Project;
+import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 
 import javax.validation.Valid;
@@ -25,7 +26,7 @@ public interface TimesheetService {
 
     public Duration getTotalDuration(List<Entry> entries);
 
-    public EntryData prepareEntryDataToEdit(long id);
+    public EntryData prepareEntryDataToEdit(long id) throws EntryNotFoundException;
 
     public void deleteEntry(long id);
 

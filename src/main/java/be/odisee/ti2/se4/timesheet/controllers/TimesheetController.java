@@ -1,5 +1,6 @@
 package be.odisee.ti2.se4.timesheet.controllers;
 
+import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 
 import be.odisee.ti2.se4.timesheet.service.TimesheetService;
@@ -133,9 +134,15 @@ public class TimesheetController {
     @GetMapping("/edit")
     public String entryEditForm(@RequestParam("id") long id, Model model) {
 
-        EntryData entryData = timesheetService.prepareEntryDataToEdit(id);
-        prepareForm(entryData, model);
-        model.addAttribute("message", "Update or Delete this entry please - or Cancel");
+        EntryData entryData = null;
+        try {
+            entryData = timesheetService.prepareEntryDataToEdit(id);
+            prepareForm(entryData, model);
+            model.addAttribute("message", "Update or Delete this entry please - or Cancel");
+        } catch (EntryNotFoundException e) {
+            entryCreateForm(model);
+            model.addAttribute("message",e.getMessage());
+        }
         return "entry";
     }
 

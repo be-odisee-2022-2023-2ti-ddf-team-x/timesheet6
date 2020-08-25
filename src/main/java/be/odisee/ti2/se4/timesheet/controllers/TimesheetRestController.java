@@ -4,9 +4,12 @@ import be.odisee.ti2.se4.timesheet.dao.EntryRepository;
 
 import be.odisee.ti2.se4.timesheet.domain.*;
 
+import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 import be.odisee.ti2.se4.timesheet.service.TimesheetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -95,10 +98,15 @@ public class TimesheetRestController {
      * @return the original data to be edited by the caller
      */
     @GetMapping("/editentrydata")
-    public Object entryEditForm(@RequestParam("id") long id) {
+    public ResponseEntity<Object> entryEditForm(@RequestParam("id") long id) {
 
-        EntryData entryData = timesheetService.prepareEntryDataToEdit(id);
-        return entryData;
+        EntryData entryData = null;
+        try {
+            entryData = timesheetService.prepareEntryDataToEdit(id);
+        } catch (EntryNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(entryData, HttpStatus.OK);
     }
 
     /**

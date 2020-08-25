@@ -2,6 +2,7 @@ package be.odisee.ti2.se4.timesheet.service;
 
 import be.odisee.ti2.se4.timesheet.dao.*;
 import be.odisee.ti2.se4.timesheet.domain.*;
+import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,9 +214,10 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public EntryData prepareEntryDataToEdit(long id) {
+    public EntryData prepareEntryDataToEdit(long id) throws EntryNotFoundException {
 
         Entry theEntry = entryRepository.findById(id);
+        if (theEntry == null) throw new EntryNotFoundException(id);
         EntryData theEntryData = prepareEntryData(theEntry,false);
         theEntryData.setId(id);
         return theEntryData;
