@@ -23,4 +23,7 @@ public class EntryData {
 
     @NotBlank(message="Description must be filled in ")
     private String description;
+
+    // HV 25-8-2020 added for security reasons
+    private String username;
 }

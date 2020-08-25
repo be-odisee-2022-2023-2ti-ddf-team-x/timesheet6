@@ -4,13 +4,13 @@ import be.odisee.ti2.se4.timesheet.dao.EntryRepository;
 
 import be.odisee.ti2.se4.timesheet.domain.*;
 
+import be.odisee.ti2.se4.timesheet.errors.EntryNotAuthorizedException;
 import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 import be.odisee.ti2.se4.timesheet.service.TimesheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -116,7 +116,13 @@ public class TimesheetRestController {
     @PostMapping(path = "deleteEntry", consumes = "application/json")
     public String deleteEntry(@RequestBody EntryData entryData) {
 
-        timesheetService.deleteEntry(entryData.getId());
+        try {
+            timesheetService.deleteEntry(entryData.getId());
+        } catch (EntryNotFoundException entryNotFoudException) {
+            return (entryNotFoudException.getMessage());
+        } catch (EntryNotAuthorizedException entryNotAuthorizedException) {
+            return (entryNotAuthorizedException.getMessage());
+        }
         return "Successfully deleted entry "+entryData.getDescription();
     }
 

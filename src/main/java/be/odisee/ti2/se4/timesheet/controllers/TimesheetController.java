@@ -1,5 +1,6 @@
 package be.odisee.ti2.se4.timesheet.controllers;
 
+import be.odisee.ti2.se4.timesheet.errors.EntryNotAuthorizedException;
 import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 
@@ -151,12 +152,19 @@ public class TimesheetController {
      * @return
      */
     @PostMapping(params = "delete")
-    public String deleteEntry(EntryData entrydata, Model model) {
+    public String deleteEntry(EntryData theEntryData, Model model) {
 
-        timesheetService.deleteEntry(entrydata.getId());
+        try {
+            timesheetService.deleteEntry(theEntryData.getId());
+            model.addAttribute("message", "Successfully deleted entry "+theEntryData.getDescription());
+        } catch (EntryNotFoundException entryNotFoudException) {
+            model.addAttribute("message", entryNotFoudException.getMessage()+" - "+theEntryData.getDescription());
+        } catch (EntryNotAuthorizedException entryNotAuthorizedException) {
+            model.addAttribute("message", entryNotAuthorizedException.getMessage()+" - "+theEntryData.getDescription());
+        }
         EntryData entryData = timesheetService.prepareNewEntryData();
         prepareForm(entryData, model);
-        model.addAttribute("message", "Successfully deleted entry "+entrydata.getDescription());
+
         return "entry";
     }
 

@@ -2,12 +2,13 @@ package be.odisee.ti2.se4.timesheet.service;
 
 import be.odisee.ti2.se4.timesheet.dao.*;
 import be.odisee.ti2.se4.timesheet.domain.*;
+import be.odisee.ti2.se4.timesheet.errors.EntryNotAuthorizedException;
 import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -143,6 +144,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             }
 
             entryData.setDescription( theEntry.getDescription() );
+            entryData.setUsername( theEntry.getUser().getUsername());
         } else {  // there is only a dummy entry for this user
             entryData.setObjectiveId(0);
             entryData.setEntryDatum(LocalDate.now().toString());
@@ -160,7 +162,8 @@ public class TimesheetServiceImpl implements TimesheetService {
         if (entryData.getId() == 0) entry = new Entry();
         else entry = entryRepository.findById( entryData.getId() );
 
-        if (entry.getUser() == null) entry.setUser( findAuthenticatedUser() );
+        // A users can only create/update entries for herself
+        entry.setUser( findAuthenticatedUser() );
 
         // The projectId is that of the one and only selected
         long[] projectIds = entryData.getProjectIds();
@@ -213,6 +216,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         return duration;
     }
 
+    @PostAuthorize("returnObject.username == authentication.principal.username")
     @Override
     public EntryData prepareEntryDataToEdit(long id) throws EntryNotFoundException {
 
@@ -224,9 +228,13 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public void deleteEntry(long id) {
+    public void deleteEntry(long id) throws EntryNotFoundException, EntryNotAuthorizedException {
 
         Entry entry = entryRepository.findById(id);
+        if (entry == null) throw new EntryNotFoundException(id);
+        // No way to handle this issue here with Spring Security gear unfortunately
+        if (entry.getUser().getUsername() != getAuthenticatedUsername())
+            throw new EntryNotAuthorizedException(id);
         entryRepository.delete(entry);
     }
 

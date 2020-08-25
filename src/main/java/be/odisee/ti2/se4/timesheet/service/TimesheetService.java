@@ -2,6 +2,7 @@ package be.odisee.ti2.se4.timesheet.service;
 
 import be.odisee.ti2.se4.timesheet.domain.Entry;
 import be.odisee.ti2.se4.timesheet.domain.Project;
+import be.odisee.ti2.se4.timesheet.errors.EntryNotAuthorizedException;
 import be.odisee.ti2.se4.timesheet.errors.EntryNotFoundException;
 import be.odisee.ti2.se4.timesheet.formdata.EntryData;
 
@@ -28,7 +29,7 @@ public interface TimesheetService {
 
     public EntryData prepareEntryDataToEdit(long id) throws EntryNotFoundException;
 
-    public void deleteEntry(long id);
+    public void deleteEntry(long id) throws EntryNotFoundException, EntryNotAuthorizedException;
 
     public String getAuthenticatedFullname();
 
