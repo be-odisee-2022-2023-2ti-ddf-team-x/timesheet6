@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,7 +23,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(path="/timesheetrest", produces = "application/json")
-@CrossOrigin(origins="http://localhost:8888", maxAge = 3600, allowCredentials = "true")  // needed for CORS cookie passing
+// needed for CORS cookie passing from vue front and API tester respectively
+@CrossOrigin(origins={"http://localhost:8888", "chrome-extension://aejoelaoggembcahagimdiliamlcdmfm"},
+        maxAge = 3600, allowCredentials = "true")
 public class TimesheetRestController {
 
     @Autowired
@@ -33,7 +36,12 @@ public class TimesheetRestController {
 
     @GetMapping("/{id}")
     public Entry getEntrybyId(@PathVariable("id") Long id) {
-        return entryRepository.findById(id).get();
+
+        if (entryRepository.findById(id).isPresent()) {
+            return entryRepository.findById(id).get();
+        } else {
+            return  null;
+        }
     }
 
     @GetMapping("/categoriesWithProjects")
@@ -64,24 +72,27 @@ public class TimesheetRestController {
     @PostMapping(path = "/processEntry", consumes = "application/json")
     public String processEntry(@Valid @RequestBody EntryData entryData, Errors errors) {
 
-        String message="";
+        StringBuilder message=new StringBuilder();
 
         try {
             // Are there any input validation errors detected by JSR 380 bean validation?
             if (errors.hasErrors() ) {
-                message = "Correct input errors, please: "+errors.getAllErrors();
+                message = new StringBuilder("Correct input errors, please: <br>");
+                for (ObjectError objectError: errors.getAllErrors()) {
+                    message.append(objectError.getDefaultMessage()).append("<br>");
+                }
                 throw new IllegalArgumentException();
             }
             // Check how many projects have been selected for this entry
             long numberNonzero = Arrays.stream( entryData.getProjectIds()).filter(x -> x>0).count();
             // There should have been one and only one project selected, if not throw an exception
             if (numberNonzero != 1) {
-                message = "Unacceptable, there must be 1 and only 1 project";
+                message = new StringBuilder("Unacceptable, there must be 1 and only 1 project");
                 throw new IllegalArgumentException();
             }
 
             // Now that the input seems to be OK, let's create a new entry or update/delete an existing entry
-            message = timesheetService.processEntry(entryData);
+            message = new StringBuilder(timesheetService.processEntry(entryData));
 
             // Prepare form for new data-entry - moeten we niet meer doen in dit geval
             // entryData = timesheetService.prepareNewEntryData();
@@ -89,7 +100,7 @@ public class TimesheetRestController {
         } catch (IllegalArgumentException e) {
             // Nothing special needs to be done
         }
-        return message;
+        return message.toString();
     }
 
     /**
@@ -100,7 +111,7 @@ public class TimesheetRestController {
     @GetMapping("/editentrydata")
     public ResponseEntity<Object> entryEditForm(@RequestParam("id") long id) {
 
-        EntryData entryData = null;
+        EntryData entryData;
         try {
             entryData = timesheetService.prepareEntryDataToEdit(id);
         } catch (EntryNotFoundException e) {
@@ -111,17 +122,15 @@ public class TimesheetRestController {
 
     /**
      * Delete the entry and prepare for creation of a new one
-     * @return
+     * @return how the operation went
      */
     @PostMapping(path = "deleteEntry", consumes = "application/json")
     public String deleteEntry(@RequestBody EntryData entryData) {
 
         try {
             timesheetService.deleteEntry(entryData.getId());
-        } catch (EntryNotFoundException entryNotFoudException) {
-            return (entryNotFoudException.getMessage());
-        } catch (EntryNotAuthorizedException entryNotAuthorizedException) {
-            return (entryNotAuthorizedException.getMessage());
+        } catch (EntryNotFoundException | EntryNotAuthorizedException e) {
+            return (e.getMessage());
         }
         return "Successfully deleted entry "+entryData.getDescription();
     }

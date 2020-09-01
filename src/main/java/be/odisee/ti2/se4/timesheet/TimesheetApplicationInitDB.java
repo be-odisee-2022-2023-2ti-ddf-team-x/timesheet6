@@ -39,21 +39,21 @@ public class TimesheetApplicationInitDB implements CommandLineRunner {
     UserRepository userRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args)  {
 
         List<User> users = Arrays.asList(
-                new User(1, "imke",
-                        "{bcrypt}$2a$10$2o9Frax4HHJLEMMb5iKs9ONs8zEmGv51IRIURY8PkBk7GsCxy4ixO",
-                        "ROLE_USER","Imke", "Courtois","imke@courtois.be"),
-                new User(2,"tessa",
-                        "{bcrypt}$2a$10$vwKk.OxTjqkzVudfuIuUauxmIrcx8Miq6vFgmLF6sgRcu7viIxgGO",
-                        "ROLE_USER","Tessa", "Wullaert", "tessa@wullaert.be"),
-                new User(3, "nicky",
-                        "{bcrypt}$2a$10$dTj8pIUJCTDi3kr.VnNRye1E7vmG7Yitx3IFFYrqAoEWwHWTJ1Zbu",
-                        "ROLE_USER","Nicky", "Evrard", "nicky@evrard.be"),
-                new User(4, "hans",
-                        "{bcrypt}$2a$10$6OnHGe1AvHhR0vTRED7Obeh02YnQlUBEXENHoXsZ7v5EFigcVWrTm",
-                        "ROLE_ADMIN","Hans", "Vandenbogaerde","hans@gmail.com")
+                            new User(1, "imke",
+                                    "{bcrypt}$2a$10$2o9Frax4HHJLEMMb5iKs9ONs8zEmGv51IRIURY8PkBk7GsCxy4ixO",
+                                    "ROLE_USER","Imke", "Courtois","imke@courtois.be"),
+                            new User(2,"tessa",
+                                    "{bcrypt}$2a$10$vwKk.OxTjqkzVudfuIuUauxmIrcx8Miq6vFgmLF6sgRcu7viIxgGO",
+                                    "ROLE_USER","Tessa", "Wullaert", "tessa@wullaert.be"),
+                            new User(3, "nicky",
+                                    "{bcrypt}$2a$10$dTj8pIUJCTDi3kr.VnNRye1E7vmG7Yitx3IFFYrqAoEWwHWTJ1Zbu",
+                                    "ROLE_USER","Nicky", "Evrard", "nicky@evrard.be"),
+                            new User(4, "hans",
+                                    "{bcrypt}$2a$10$6OnHGe1AvHhR0vTRED7Obeh02YnQlUBEXENHoXsZ7v5EFigcVWrTm",
+                                    "ROLE_ADMIN","Hans", "Vandenbogaerde","hans@gmail.com")
         );
 
         for (User user: users) {
@@ -76,7 +76,7 @@ public class TimesheetApplicationInitDB implements CommandLineRunner {
 
 
         // For convenience each user gets a copy of the same categories, projects and objectives
-        // Obiously, each user can have her own sets if this is desired
+        // Obviously, each user can have her own sets if this is desired
         for (User user : users) {
 
             List<Category> categories = Arrays.asList(
@@ -90,7 +90,7 @@ public class TimesheetApplicationInitDB implements CommandLineRunner {
 
             for (Category category : categories) {
                 categoryRepository.save(category);
-            };
+            }
 
             List<Project> projects = Arrays.asList(
                     new Project("General", categoryRepository.findCategoryByUserAndName(user,"OVHD"), user),
